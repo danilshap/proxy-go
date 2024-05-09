@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"proxy-go/pkg/proxy"
+	"regexp"
 	"strings"
 )
 
@@ -37,8 +38,18 @@ func handleTunnel(args []string) {
 	}
 
 	url := args[1]
+	if isValidURL(url) {
+		fmt.Println("Unfortunately, the string entered does not look like a link")
+		return
+	}
+
 	encodedURL := proxy.AddNewProxyTunnel(url)
 	fmt.Printf("Encrypted URL: %s\n", encodedURL)
+}
+
+func isValidURL(url string) bool {
+	var re = regexp.MustCompile(`^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})(:[0-9]{1,5})?(\/[\w\.-]*)*\/?$`)
+	return re.MatchString(url)
 }
 
 func listTunnels() {
