@@ -3,9 +3,8 @@ package utils
 import (
 	"crypto/rand"
 	"fmt"
+	"proxy-go/config"
 )
-
-const baseUrlDomain string = "localhost:8081"
 
 func GenerateUri() string {
 	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -19,5 +18,6 @@ func GenerateUri() string {
 
 	route := string(bytes)
 
-	return fmt.Sprintf("http://%s/%s", baseUrlDomain, route)
+	baseProxyDomain := config.GetProxyDomain()
+	return fmt.Sprintf("http://%s/%s", baseProxyDomain, route)
 }

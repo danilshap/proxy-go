@@ -5,14 +5,19 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"proxy-go/config"
 	"proxy-go/pkg/commands"
 	"proxy-go/pkg/proxy"
 )
 
+func init() {
+	config.InitConfig()
+}
+
 func main() {
 	go func() {
 		http.HandleFunc("/", proxy.HandleProxy)
-		http.ListenAndServe(":8081", nil)
+		http.ListenAndServe(config.GetProxyDomain(), nil)
 	}()
 
 	scanner := bufio.NewScanner(os.Stdin)
