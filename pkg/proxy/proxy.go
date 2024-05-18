@@ -1,7 +1,9 @@
 package proxy
 
 import (
+	"io"
 	"net/http"
+	"net/url"
 	"proxy-go/utils"
 	"sync"
 )
@@ -21,7 +23,7 @@ func HandleProxy(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	proxyReq, err := http.NewRequest(r.Method, target+r.URL.RequestURI(), r.Body)
+	proxyReq, err := http.NewRequest(r.Method, target, r.Body)
 	if err != nil {
 		http.Error(w, "Failed to create request", http.StatusInternalServerError)
 		return
@@ -44,23 +46,37 @@ func HandleProxy(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(resp.StatusCode)
-	w.Write([]byte("Proxy response: \n"))
-	resp.Write(w)
+	if _, err := io.Copy(w, resp.Body); err != nil {
+		http.Error(w, "Failed to copy response body", http.StatusInternalServerError)
+	}
 }
 
-func IsNewTunnelAvaliable() bool {
-	return len(tunnels) >= maxTunnels
+func IsNewTunnelAvailable() bool {
+	return len(tunnels) < maxTunnels
 }
 
-func AddNewProxyTunnel(url string) string {
+func AddNewProxyTunnel(url string) (string, error) {
 	encodedURL := utils.GenerateUri()
+	encodedPath, err := getPathFromEncodedURL(encodedURL)
+	if err != nil {
+		return "", err
+	}
+
 	mu.Lock()
-	tunnels[encodedURL] = url
+	tunnels[encodedPath] = url
 	mu.Unlock()
 
-	return encodedURL
+	return encodedURL, nil
 }
 
-func GetListOfTunels() map[string]string {
+func getPathFromEncodedURL(encodedURL string) (string, error) {
+	parsedURL, err := url.Parse(encodedURL)
+	if err != nil {
+		return "", err
+	}
+	return parsedURL.Path, nil
+}
+
+func GetListOfTunnels() map[string]string {
 	return tunnels
 }

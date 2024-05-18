@@ -32,7 +32,7 @@ func handleTunnel(args []string) {
 		return
 	}
 
-	if proxy.IsNewTunnelAvaliable() {
+	if !proxy.IsNewTunnelAvailable() {
 		fmt.Println("Maximum number of tunnels reached. Cannot add more.")
 		return
 	}
@@ -43,7 +43,12 @@ func handleTunnel(args []string) {
 		return
 	}
 
-	encodedURL := proxy.AddNewProxyTunnel(url)
+	encodedURL, err := proxy.AddNewProxyTunnel(url)
+	if err != nil {
+		fmt.Println("Invalid url")
+		return;
+	}
+	
 	fmt.Printf("Encrypted URL: %s\n", encodedURL)
 }
 
@@ -54,7 +59,7 @@ func isValidURL(url string) bool {
 
 func listTunnels() {
 	fmt.Println("Active tunnels:")
-	tunnels := proxy.GetListOfTunels()
+	tunnels := proxy.GetListOfTunnels()
 	for encoded, original := range tunnels {
 		fmt.Printf("Encoded: %s, Original: %s\n", encoded, original)
 	}

@@ -17,7 +17,11 @@ func init() {
 func main() {
 	go func() {
 		http.HandleFunc("/", proxy.HandleProxy)
-		http.ListenAndServe(config.GetProxyDomain(), nil)
+		proxyAddress := config.GetProxyDomain()
+		if err := http.ListenAndServe(proxyAddress, nil); err != nil {
+			fmt.Printf("Failed to start proxy server: %v\n", err)
+			os.Exit(1)
+		}
 	}()
 
 	scanner := bufio.NewScanner(os.Stdin)
