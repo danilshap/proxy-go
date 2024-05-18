@@ -1,4 +1,3 @@
-
 # Go Tunnel Manager
 
 ## Overview
@@ -27,6 +26,13 @@ The Go Tunnel Manager is a simple tunneling application written in Go. It allows
    ```bash
    go run main.go
    ```
+
+## .env File
+The application requires a `.env` file to specify the domain. Here is an example of the `.env` file content:
+```md
+DOMAIN="localhost:{port}"
+```
+Place this file in the root directory of the project.
 
 ## How to Use
 After starting the application, use the command line interface to manage tunnels:
